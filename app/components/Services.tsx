@@ -1,9 +1,18 @@
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import ScrollTriggerModule from "gsap/ScrollTrigger";
-const { ScrollTrigger } = ScrollTriggerModule;
 
-gsap.registerPlugin(ScrollTrigger);
+// Client-side only GSAP imports
+let gsap: any;
+let ScrollTrigger: any;
+
+if (typeof window !== 'undefined') {
+  import('gsap').then((gsapModule) => {
+    gsap = gsapModule.gsap;
+    return import('gsap/ScrollTrigger');
+  }).then((ScrollTriggerModule) => {
+    ScrollTrigger = ScrollTriggerModule.ScrollTrigger;
+    gsap.registerPlugin(ScrollTrigger);
+  });
+}
 
 const services = [
   {
@@ -32,6 +41,8 @@ export function Services() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !gsap || !ScrollTrigger) return;
+
     gsap.fromTo(
       titleRef.current,
       { opacity: 0, y: 50 },
